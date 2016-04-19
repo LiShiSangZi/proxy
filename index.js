@@ -11,8 +11,6 @@ wss.on('connection', function(ws) {
   var address = config.remote.address + path;
   if (location.query && location.query.redirect) {
     address = config.remote.list2;
-  } else {
-    console.log(address);
   }
   var webSocket = new WebSocket(address);
 
@@ -37,6 +35,7 @@ wss.on('connection', function(ws) {
   }
 
   ws.on('message', function(message) {
+    console.log(ws.upgradeReq.host);
     messageList.push(message);
 
     if (connected) {
