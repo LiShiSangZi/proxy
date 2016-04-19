@@ -3,6 +3,7 @@ var WebSocketServer = WebSocket.Server;
 var config = require('./config');
 var url = require('url');
 var express = require('express');
+var http = require('http');
 
 var wss = new WebSocketServer(config.server);
 
