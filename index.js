@@ -2,6 +2,7 @@ var WebSocket = require('ws');
 var WebSocketServer = WebSocket.Server;
 var config = require('./config');
 var url = require('url');
+var express = require('express');
 
 var wss = new WebSocketServer(config.server);
 
@@ -99,3 +100,24 @@ wss.on('connection', function(ws) {
     }
   })
 });
+
+
+// Add proxy service.
+
+var app = express();
+app.get('/proxy', function(req, res, next) {
+  var url = req.query.url;
+  request.get('http://' + config.remote.proxy + '/proxy?url=' + encodeURIComponent(url)).on('error', function(error) {
+    res.status(404).send('Not Found');
+  }).pipe(res);
+});
+var port = normalizePort(process.env.PORT || '9888');
+app.set('port', port);
+
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+server.listen(port);
