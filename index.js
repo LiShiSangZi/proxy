@@ -111,7 +111,7 @@ app.get('/proxy', function(req, res, next) {
     res.status(404).send('Not Found');
   }).pipe(res);
 });
-var port = normalizePort(process.env.PORT || '9888');
+var port = process.env.PORT || '9888';
 app.set('port', port);
 
 
