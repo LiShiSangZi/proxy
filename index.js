@@ -35,7 +35,7 @@ wss.on('connection', function(ws) {
   }
 
   ws.on('message', function(message) {
-    console.log(ws.upgradeReq.host);
+    console.log(ws.upgradeReq.headers.host);
     messageList.push(message);
 
     if (connected) {
