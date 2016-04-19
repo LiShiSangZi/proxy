@@ -35,7 +35,7 @@ wss.on('connection', function(ws) {
   }
 
   ws.on('message', function(message) {
-    console.log(ws.upgradeReq.headers.host);
+    message = message.replace(ws.upgradeReq.headers.host, config.remote.address.replace('ws://', ''));
     messageList.push(message);
 
     if (connected) {
