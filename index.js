@@ -4,6 +4,7 @@ var config = require('./config');
 var url = require('url');
 var express = require('express');
 var http = require('http');
+var request = require('request');
 
 var wss = new WebSocketServer(config.server);
 
