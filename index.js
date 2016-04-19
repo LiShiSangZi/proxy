@@ -37,6 +37,7 @@ wss.on('connection', function(ws) {
             message.params.connectURL = message.params.connectURL.replace(regExp, '"' + config.remote.address + path + '"');
           } else if (typeof message == 'string') {
             message = message.replace(/\"connectURL\"\:\"ws\:(.*?)\?redirect\=(.*?)\"/, '"connectURL": "$2"');
+            console.log(message);
           }
         }
 
@@ -120,7 +121,7 @@ wss.on('connection', function(ws) {
       if (/redirect/.test(msg)) {
         console.log(msg);
       }
-      
+
       msg = msg.replace(reg, 'redirectURL$1:"xre://' + ws.upgradeReq.headers.host + '/?redirect=ws$2"');
 
 
