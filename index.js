@@ -10,14 +10,7 @@ wss.on('connection', function(ws) {
   var path = location.path;
   var address = config.remote.address + path;
   if (location.query && location.query.redirect) {
-    address = location.query.redirect;
-    if (/^wss/.test(address)) {
-      var p = address.replace(/^wss\:\/\/(.*?)\//, config.remote.list2);
-      console.log(p);
-    } else {
-      address = config.remote.list;
-    }
-    address = address.replace(/^xre/, 'ws');
+    address = config.remote.list2;
   }
   var webSocket = new WebSocket(address);
 
@@ -33,14 +26,6 @@ wss.on('connection', function(ws) {
   function sendMessage() {
     if (!webSocketClose) {
       messageList.forEach(function(message) {
-
-        if (message) {
-          if (message.params && message.params.connectURL) {
-            message.params.connectURL = message.params.connectURL.replace(regExp, '"' + config.remote.address + path + '"');
-          } else if (typeof message == 'string') {
-            message = message.replace(/\"connectURL\"\:\"ws\:(.*?)\?redirect\=(.*?)\"/, '"connectURL": "' + config.remote.address + path + '"').replace(/\"connectURL\"\:\"(.*?)\"/, '"connectURL":"' + config.remote.address + path + '"');
-          }
-        }
 
         webSocket.send(message);
       });
@@ -106,38 +91,8 @@ wss.on('connection', function(ws) {
   var reg = /redirectURL(\"*)\:\"xre(.*?)\"/;
 
   webSocket.on('message', function(msg, flag) {
-    // Find out the websocket msg.
-    // msg = JSON.parse(msg);
 
-    if (typeof msg == 'string') {
-      msg = msg.replace(/(.*)\"(.*?)redirect=(.*?)\"/, '$1$3');
-      msg = msg.replace(/\"(\w*?)\:\/\/(.*?)\"/g, '"$1://' + ws.upgradeReq.headers.host + '?redirect=' + '$1://$2"');
-    }
-
-
-
-    // if (typeof msg == 'object') {
-
-    //   if (msg.redirectURL) {
-    //     msg.redirectURL = 'xre://' + ws.upgradeReq.headers.host + '?redirect=' + msg.redirectURL.replace(/^(.*)redirect=(.*?)$/, '$2').replace(/^xre/, 'ws');
-    //   }
-    //   if (msg.klass == 'XREApplication') {
-    //     msg.params.url = 'wss://' + ws.upgradeReq.headers.host + '?redirect=' + msg.params.url.replace(/^(.*)redirect=(.*?)$/, '$2');
-    //   }
-    // } else if (typeof msg == 'string') {
-    //   msg = msg.replace(/(.*)\"(.*?)redirect=(.*?)\"/, '$1$3');
-
-
-    //   msg = msg.replace(reg, 'redirectURL$1:"xre://' + ws.upgradeReq.headers.host + '/?redirect=ws$2"');
-
-
-    //   if (/XREApplication/.test(msg)) {
-    //     msg = msg.replace(/\"url\"\:\"(.*?)\"/, '"url":"' + 'ws://' + ws.upgradeReq.headers.host + '/?redirect=$1"');
-    //   }
-
-    //   msg = msg.replace(/\"(\w*?)\:\/\/(.*?)\:(\d+)\/(.*?)\"/, '"$1://' + ws.upgradeReq.headers.host + '?redirect=' + '$1://$2:$3/$4"');
-    // }
-    // msg = JSON.stringify(msg);
+    msg = msg.replace(/\"((\w+)\:\/\/(.*?)\.xcal.tv\:(\d+)\/(.*?))\"/, '"ws://' + ws.upgradeReq.headers.host + '?redirect=$1"');
     if (!wsClosed) {
       ws.send(msg);
     }
