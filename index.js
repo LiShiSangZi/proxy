@@ -109,7 +109,11 @@ wss.on('connection', function(ws) {
 var app = express();
 app.get('/proxy', function(req, res, next) {
   var url = req.query.url;
-  request.get('http://' + config.remote.proxy + '/proxy?url=' + encodeURIComponent(url)).on('error', function(error) {
+  var u = url;
+  if (config.remote.proxy) {
+    u = 'http://' + config.remote.proxy + '/proxy?url=' + encodeURIComponent(url);
+  }
+  request.get(u).on('error', function(error) {
     res.status(404).send('Not Found');
   }).pipe(res);
 });
