@@ -110,24 +110,25 @@ wss.on('connection', function(ws) {
   })
 });
 
+if (config.monitor) {
+  var monitor = new WebSocketServer(config.monitor);
+  monitor.on('connection', function(ws) {
+    var uuid = '' + Math.round(Math.random() * 10000000);
+    socketPool[uuid] = ws;
 
-var monitor = new WebSocketServer(config.monitor);
-monitor.on('connection', function(ws) {
-  var uuid = '' + Math.round(Math.random() * 10000000);
-  socketPool[uuid] = ws;
+    ws.on('close', function(code, data) {
+      // Client side disconnected.
 
-  ws.on('close', function(code, data) {
-    // Client side disconnected.
+      socketPool[uuid] = undefined;
 
-    socketPool[uuid] = undefined;
+      delete socketPool[uuid];
+    });
 
-    delete socketPool[uuid];
+    ws.on('error', function(error) {
+      webSocket.close()
+    });
   });
-
-  ws.on('error', function(error) {
-    webSocket.close()
-  });
-});
+}
 
 // Add proxy service.
 
