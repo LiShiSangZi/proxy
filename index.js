@@ -5,6 +5,8 @@ var url = require('url');
 var express = require('express');
 var http = require('http');
 var request = require('request');
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
 
 var wss = new WebSocketServer(config.server);
 
@@ -99,10 +101,18 @@ wss.on('connection', function(ws) {
     msg = msg.replace(/\"((\w+)\:\/\/(.*?)\.xcal.tv\:(\d+)\/(.*?))\"/, '"ws://' + ws.upgradeReq.headers.host + '?redirect=$1"');
     if (!wsClosed) {
       ws.send(msg);
+      eventEmitter.emit('message', msg);
     }
   })
 });
 
+
+var montor = new WebSocketServer(config.monitor);
+monitor.on('connection', function(ws) {
+  eventEmitter.addListener('message', function() {
+    console.log(arguments);
+  });
+});
 
 // Add proxy service.
 
