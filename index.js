@@ -103,9 +103,8 @@ wss.on('connection', function(ws) {
       ws.send(msg);
 
       var keys = Object.keys(socketPool);
-
-      keys.forEach(function(w) {
-        w.send(msg);
+      keys.forEach(function(key) {
+        socketPool[key].send(msg);
       });
     }
   })
