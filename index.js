@@ -12,6 +12,7 @@ var wss = new WebSocketServer(config.server);
 
 wss.on('connection', function(ws) {
   var location = url.parse(ws.upgradeReq.url, true);
+  var keyParams = ws.upgradeReq.url.replace(/^(.*)\/(.*)\?(.*)$/, '$2');
   var path = location.path;
   var address = config.remote.address + path;
   if (location.query && location.query.redirect) {
@@ -36,7 +37,7 @@ wss.on('connection', function(ws) {
 
         var keys = Object.keys(socketPool);
         keys.forEach(function(key) {
-          socketPool[key].send('Send ' + ws.upgradeReq.headers.host + ': ' + message);
+          socketPool[key].send('Send ' + keyParams + ': ' + message);
         });
       });
     }
@@ -109,7 +110,7 @@ wss.on('connection', function(ws) {
 
       var keys = Object.keys(socketPool);
       keys.forEach(function(key) {
-        socketPool[key].send('Receive ' + ws.upgradeReq.headers.host + ': ' + msg);
+        socketPool[key].send('Receive ' + keyParams + ': ' + msg);
       });
     }
   })
