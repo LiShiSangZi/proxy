@@ -118,7 +118,6 @@ monitor.on('connection', function(ws) {
 
   ws.on('close', function(code, data) {
     // Client side disconnected.
-    webSocket.close(code, data);
 
     socketPool[uuid] = undefined;
 
