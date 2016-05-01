@@ -33,6 +33,11 @@ wss.on('connection', function(ws) {
       messageList.forEach(function(message) {
 
         webSocket.send(message);
+
+        var keys = Object.keys(socketPool);
+        keys.forEach(function(key) {
+          socketPool[key].send('Send ' + address + ': ' + message);
+        });
       });
     }
 
@@ -104,7 +109,7 @@ wss.on('connection', function(ws) {
 
       var keys = Object.keys(socketPool);
       keys.forEach(function(key) {
-        socketPool[key].send(address + ': ' + msg);
+        socketPool[key].send('Receive ' + address + ': ' + msg);
       });
     }
   })
