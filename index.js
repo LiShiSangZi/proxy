@@ -36,7 +36,7 @@ wss.on('connection', function(ws) {
 
         var keys = Object.keys(socketPool);
         keys.forEach(function(key) {
-          socketPool[key].send('Send ' + webSocket.url + ': ' + message);
+          socketPool[key].send('Send ' + ws.upgradeReq.headers.host + ': ' + message);
         });
       });
     }
@@ -109,7 +109,7 @@ wss.on('connection', function(ws) {
 
       var keys = Object.keys(socketPool);
       keys.forEach(function(key) {
-        socketPool[key].send('Receive ' + webSocket.url + ': ' + msg);
+        socketPool[key].send('Receive ' + ws.upgradeReq.headers.host + ': ' + msg);
       });
     }
   })
