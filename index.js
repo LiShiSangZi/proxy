@@ -5,8 +5,8 @@ var url = require('url');
 var express = require('express');
 var http = require('http');
 var request = require('request');
-var events = require('events');
-var eventEmitter = new events.EventEmitter();
+
+var socketPool = {};
 
 var wss = new WebSocketServer(config.server);
 
@@ -101,16 +101,33 @@ wss.on('connection', function(ws) {
     msg = msg.replace(/\"((\w+)\:\/\/(.*?)\.xcal.tv\:(\d+)\/(.*?))\"/, '"ws://' + ws.upgradeReq.headers.host + '?redirect=$1"');
     if (!wsClosed) {
       ws.send(msg);
-      eventEmitter.emit('message', msg);
+
+      var keys = Object.keys(socketPool);
+
+      keys.forEach(function(w) {
+        w.send(msg);
+      });
     }
   })
 });
 
 
-var montor = new WebSocketServer(config.monitor);
+var monitor = new WebSocketServer(config.monitor);
 monitor.on('connection', function(ws) {
-  eventEmitter.addListener('message', function() {
-    console.log(arguments);
+  var uuid = '' + Math.round(Math.random() * 10000000);
+  socketPool[uuid] = ws;
+
+  ws.on('close', function(code, data) {
+    // Client side disconnected.
+    webSocket.close(code, data);
+
+    socketPool[uuid] = undefined;
+
+    delete socketPool[uuid];
+  });
+
+  ws.on('error', function(error) {
+    webSocket.close()
   });
 });
 
