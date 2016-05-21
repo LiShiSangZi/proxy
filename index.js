@@ -16,7 +16,7 @@ wss.on('connection', function(ws) {
   var path = location.path;
   var address = config.remote.address + path;
   if (location.query && location.query.redirect) {
-    address = location.query.redirect;
+    address = location.query.redirect.replace(/^xre/, 'ws').replace(/^wss/, 'ws').replace(/\:18082/, '10004');
   }
   var webSocket = new WebSocket(address);
 
