@@ -15,9 +15,29 @@ wss.on('connection', function(ws) {
   var keyParams = ws.upgradeReq.url.replace(/^(.*)\/(.*)\?(.*)$/, '$2');
   var path = location.path;
   var address = config.remote.address + path;
-  if (location.query && location.query.redirect) {
-    address = location.query.redirect.replace(/^xre/, 'ws').replace(/^wss/, 'ws').replace(/\:18082/, '10004');
+  if (location.query) {
+    if (location.query.redirect) {
+      address = location.query.redirect.replace(/^xre/, 'ws').replace(/^wss/, 'ws').replace(/\:18082/, '10004');
+    } else if (location.query.debug == '1') {
+      var uuid = '' + Math.round(Math.random() * 10000000);
+      socketPool[uuid] = ws;
+
+      ws.on('close', function(code, data) {
+        // Client side disconnected.
+
+        socketPool[uuid] = undefined;
+
+        delete socketPool[uuid];
+      });
+
+      ws.on('error', function(error) {
+        webSocket.close()
+      });
+
+      return;
+    }
   }
+
   var webSocket = new WebSocket(address);
 
 
@@ -28,6 +48,7 @@ wss.on('connection', function(ws) {
 
   var wsClosed = false;
   var webSocketClose = false;
+
 
   function sendMessage() {
     if (!webSocketClose) {
@@ -47,6 +68,7 @@ wss.on('connection', function(ws) {
 
   ws.on('message', function(message) {
     message = message.replace(ws.upgradeReq.headers.host, config.remote.address.replace('ws://', ''));
+    message = message.replace(/\"ws.*?\?redirect\=/, '"').replace(/\"xre.*?\?redirect\=/, '"');
     messageList.push(message);
 
     if (connected) {
@@ -115,26 +137,6 @@ wss.on('connection', function(ws) {
     }
   })
 });
-
-if (config.monitor) {
-  var monitor = new WebSocketServer(config.monitor);
-  monitor.on('connection', function(ws) {
-    var uuid = '' + Math.round(Math.random() * 10000000);
-    socketPool[uuid] = ws;
-
-    ws.on('close', function(code, data) {
-      // Client side disconnected.
-
-      socketPool[uuid] = undefined;
-
-      delete socketPool[uuid];
-    });
-
-    ws.on('error', function(error) {
-      webSocket.close()
-    });
-  });
-}
 
 // Add proxy service.
 
